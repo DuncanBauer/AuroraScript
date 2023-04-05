@@ -13,12 +13,13 @@ int main(int argc, char** argv)
 		file.close();
 
 		std::string data = buf.str();
-		std::cout << data << '\n';
+		std::vector<std::pair<Token, std::string>> tokens = Tokenize(data);
+		std::cout << tokens.size() << '\n';
 
-		std::vector<Token> tokens = lex(data);
-		for(Token t : tokens)
-			std::cout << (int)t << ' ';
-		std::cout << '\n';
+		for (auto t : tokens) {
+			std::cout << (int)t.first << ' ';
+			std::cout << t.second << '\n';
+		}
 
 		std::cin.ignore(1000, '\n');
 	}
