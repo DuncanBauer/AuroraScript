@@ -1,4 +1,4 @@
-workspace "Tests"
+workspace "AuroraScript"
 	architecture "x64"
 	configurations
 	{
@@ -14,7 +14,7 @@ IncludeDir["AuroraScript"] = "AuroraScript/src"
 
 project "AuroraScript"
 	location "AuroraScript"
-	kind "StaticLib"
+	kind "ConsoleApp"
 	staticruntime "on"
 	language "C++"
 	cppdialect "C++20"
@@ -65,11 +65,6 @@ project "AuroraScriptTesting"
 	includedirs
 	{
 		"%{IncludeDir.AuroraScript}"
-	}
-
-	links
-	{
-		"AuroraScript"
 	}
 
 	filter "system:windows"
