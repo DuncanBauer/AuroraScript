@@ -14,7 +14,6 @@ int main(int argc, char** argv)
 
 		std::string data = buf.str();
 		std::vector<std::pair<Token, std::string>> tokens = Tokenize(data);
-		std::cout << tokens.size() << '\n';
 
 		for (auto t : tokens) {
 			std::cout << (int)t.first << ' ';

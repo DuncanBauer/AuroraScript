@@ -17,7 +17,7 @@ std::vector<std::pair<Token, std::string>> Tokenize(std::string data)
 		std::smatch match = *iter;
 		Token tokenType;
 		std::string tokenValue;
-
+		
 		// Get Token type and value from match
 		for (int i = 0; i < match.size(); i++)
 		{

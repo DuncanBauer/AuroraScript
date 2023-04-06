@@ -1,0 +1,118 @@
+
+grammar Expr;
+program : statement* ;
+block : '{' statement* '}' ;
+statement : class_declaration 
+			| function_declaration
+			| enum_declaration
+			| while_statement
+			| do_while_statement
+			| for_statement
+			| if_statement
+			| switch_statement
+			| expr
+			| var_declaration
+			| try_catch_statement
+			| return_statement ;
+
+class_declaration : 'class' IDENTIFIER '{' class_body '}' ;
+class_body : class_member* ; 
+class_member : function_declaration
+			| var_declaration ;
+
+function_declaration : 'function' IDENTIFIER '(' param_list? ')' block ;
+
+enum_declaration : 'enum' IDENTIFIER '{' enum_body '}' ;
+enum_body : IDENTIFIER (',' IDENTIFIER)* ;
+
+while_statement : 'while' '(' expr ')' block ;
+do_while_statement : 'do' block 'while' '(' expr ')' ;
+for_statement : 'for' '(' expr? ';' expr? ';' expr? ')' block ;
+
+if_statement : 'if' '(' expr ')' block ('else' block)? ;
+switch_statement : 'switch' '(' expr ')' '{' case_statement* '}' ;
+case_statement : 'case' expr ':' expr* 'break' ;
+return_statement : 'return' expr? ;
+
+try_catch_statement : 'try' block 'catch' '(' IDENTIFIER IDENTIFIER ')' block ;
+
+param_list : expr (',' expr)* ;
+
+array_declaration : var_declaration '[' ']' ;
+var_declaration : number_declaration | string_declaration | bool_declaration ;
+number_declaration : 'number' IDENTIFIER ('=' expr)? ;
+string_declaration : 'string' IDENTIFIER ('=' expr)? ;
+bool_declaration : 'bool' IDENTIFIER ('=' expr)? ;
+
+line_comment : '//' .*? '\n' ;
+block_comment : '/*' .*? '*/' ;
+
+expr : '(' expr ')'
+		
+		| expr '++'
+		| expr '--'
+		| expr '.' expr
+
+		| '++' expr
+		| '--' expr
+		| '+' expr
+		| '-' expr
+		| '!' expr
+		| '~' expr
+		
+		| expr '*' expr
+		| expr '/' expr
+		| expr '%' expr
+		| expr '+' expr
+		| expr '-' expr
+		
+		| expr '<<' expr
+		| expr '>>' expr
+
+		| expr '<' expr
+		| expr '>' expr
+		| expr '<=' expr
+		| expr '>=' expr
+
+		| expr '==' expr
+		| expr '===' expr
+		| expr '!=' expr
+		
+		| expr '&' expr
+		| expr '^' expr
+		| expr '|' expr
+		
+		| expr '&&' expr
+		| expr '||' expr
+	
+		| expr '?' expr ':' expr
+		| expr '=' expr
+		
+		| expr '*=' expr
+		| expr '/=' expr
+		| expr '%=' expr
+		| expr '+=' expr
+		| expr '-=' expr
+		
+		| expr '<<=' expr
+		| expr '>>=' expr
+		
+		| expr '^=' expr
+		| expr '&=' expr
+		| expr '|=' expr
+		
+		| expr ',' expr?
+
+		| TRUE_LITERAL
+		| FALSE_LITERAL
+		| NULL_LITERAL
+		| NUMBER_LITERAL
+		| STRING_LITERAL
+		| IDENTIFIER ;
+
+TRUE_LITERAL : 'true' ;
+FALSE_LITERAL : 'false' ;
+NULL_LITERAL : 'null' ;
+STRING_LITERAL : '(".*?")|('.*?')|(`.*?`)' ;
+NUMBER_LITERAL : '[-]?(d+)?(.d+)?' ;
+IDENTIFIER : '[a-zA-Z_][a-zA-Z0-9_]*' ;
