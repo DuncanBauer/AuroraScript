@@ -2,27 +2,31 @@
 grammar Expr;
 program : statement* ;
 block : '{' statement* '}' ;
-statement : class_declaration 
-			| function_declaration
-			| enum_declaration
+statement : class_statement 
+			| function_statement
+			| enum_statement
 			| while_statement
 			| do_while_statement
 			| for_statement
 			| if_statement
 			| switch_statement
-			| expr
-			| var_declaration
 			| try_catch_statement
-			| return_statement ;
 
-class_declaration : 'class' IDENTIFIER '{' class_body '}' ;
+			| var_statement
+			| return_statement 
+			| break_statement
+			| continue_statement
+			| expr ;
+
+class_statement : 'class' IDENTIFIER '{' class_body '}' ;
 class_body : class_member* ; 
-class_member : function_declaration
-			| var_declaration ;
+class_member : function_statement
+			| var_statement ;
 
-function_declaration : 'function' IDENTIFIER '(' param_list? ')' block ;
+function_statement : 'function' IDENTIFIER '(' param_list? ')' block ;
+param_list : expr (',' expr)* ;
 
-enum_declaration : 'enum' IDENTIFIER '{' enum_body '}' ;
+enum_statement : 'enum' IDENTIFIER '{' enum_body '}' ;
 enum_body : IDENTIFIER (',' IDENTIFIER)* ;
 
 while_statement : 'while' '(' expr ')' block ;
@@ -32,17 +36,17 @@ for_statement : 'for' '(' expr? ';' expr? ';' expr? ')' block ;
 if_statement : 'if' '(' expr ')' block ('else' block)? ;
 switch_statement : 'switch' '(' expr ')' '{' case_statement* '}' ;
 case_statement : 'case' expr ':' expr* 'break' ;
-return_statement : 'return' expr? ;
-
 try_catch_statement : 'try' block 'catch' '(' IDENTIFIER IDENTIFIER ')' block ;
 
-param_list : expr (',' expr)* ;
+return_statement : 'return' expr? ;
+break_statement: 'break' ;
+continue_statement: 'continue' ;
 
-array_declaration : var_declaration '[' ']' ;
-var_declaration : number_declaration | string_declaration | bool_declaration ;
-number_declaration : 'number' IDENTIFIER ('=' expr)? ;
-string_declaration : 'string' IDENTIFIER ('=' expr)? ;
-bool_declaration : 'bool' IDENTIFIER ('=' expr)? ;
+array_statement : var_statement '[' ']' ;
+var_statement : number_statement | string_statement | bool_statement ;
+number_statement : 'number' IDENTIFIER ('=' expr)? ;
+string_statement : 'string' IDENTIFIER ('=' expr)? ;
+bool_statement : 'bool' IDENTIFIER ('=' expr)? ;
 
 line_comment : '//' .*? '\n' ;
 block_comment : '/*' .*? '*/' ;

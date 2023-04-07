@@ -1,0 +1,48 @@
+
+grammar Expr;
+program : statement* ;
+block : '{' statement* '}' ;
+statement : if_statement
+	| var_statement
+	| return_statement 
+	| expr ;
+
+if_statement : 'if' '(' expr ')' block ('else' block)? ;
+
+return_statement : 'return' expr? ;
+
+var_statement : number_statement | string_statement | bool_statement ;
+number_statement : 'number' IDENTIFIER ('=' expr)? ;
+string_statement : 'string' IDENTIFIER ('=' expr)? ;
+bool_statement : 'bool' IDENTIFIER ('=' expr)? ;
+
+expr : unary_expr
+	| binary_expr
+	| TRUE_LITERAL
+	| FALSE_LITERAL
+	| NULL_LITERAL
+	| NUMBER_LITERAL
+	| STRING_LITERAL
+	| IDENTIFIER ;
+
+unary_expr : '(' expr ')'
+	| expr '++'
+	| expr '--'
+	| '++' expr
+	| '--' expr
+	| '+' expr
+	| '-' expr ;
+
+binary_expr : expr '*' expr
+	| expr '/' expr
+	| expr '%' expr
+	| expr '+' expr
+	| expr '-' expr 
+	| expr '=' expr;
+
+TRUE_LITERAL : 'true' ;
+FALSE_LITERAL : 'false' ;
+NULL_LITERAL : 'null' ;
+STRING_LITERAL : '(".*?")|('.*?')|(`.*?`)' ;
+NUMBER_LITERAL : '[-]?(d+)?(.d+)?' ;
+IDENTIFIER : '[a-zA-Z_][a-zA-Z0-9_]*' ;

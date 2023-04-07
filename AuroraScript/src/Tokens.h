@@ -1,5 +1,10 @@
 #pragma once
 
+enum class UnaryExpressionType {
+	PREFIX,
+	POSTFIX
+};
+
 enum class Token {
 	TOK_IDENTIFIER,		// [a-zA-Z_][a-zA-Z0-9_]*
 
@@ -9,6 +14,9 @@ enum class Token {
 	TOK_TRUE,			// true
 	TOK_FALSE,			// false
 	TOK_NULL,			// null
+	TOK_NEW_LINE, 		// \n
+	TOK_TAB,			// \t
+	TOK_SPACE,			// ' '
 
 	// Keywords
 	TOK_CLASS,			// class
@@ -31,6 +39,9 @@ enum class Token {
 	TOK_IMPORT,			// import
 	TOK_AS,				// as
 	TOK_ENUM,			// enum
+	TOK_TRY,			// try
+	TOK_CATCH,			// catch
+	TOK_EOF,			// EOF
 
 	// Types
 	TOK_VOID,			// void
@@ -39,9 +50,8 @@ enum class Token {
 	TOK_STRING,			// string
 
 	// Comment symbols
-	TOK_LINE_COMMENT,			// //
-	TOK_BLOCK_COMMENT_START,	// /* 
-	TOK_BLOCK_COMMENT_END,		// */
+	TOK_LINE_COMMENT,	// //
+	TOK_BLOCK_COMMENT,	// /* .* */
 
 	// Operators
 	TOK_OPEN_PAREN,		// (
@@ -106,7 +116,6 @@ enum class Token {
 	TOK_DECREMENT,		// --
 };
 
-
 const std::vector<std::pair<Token, std::string>> TOKEN_REGEXES = {
 	// Keywords
 	{ Token::TOK_CLASS, "class$" },								// class
@@ -128,7 +137,10 @@ const std::vector<std::pair<Token, std::string>> TOKEN_REGEXES = {
 	{ Token::TOK_NEW, "new$" },									// new
 	{ Token::TOK_IMPORT, "import$" },							// import
 	{ Token::TOK_AS, "as$" },									// as
-	{ Token::TOK_ENUM, "enum&"},								// enum
+	{ Token::TOK_ENUM, "enum" },								// enum
+	{ Token::TOK_TRY, "try" },									// try
+	{ Token::TOK_CATCH, "catch" },								// catch
+	{ Token::TOK_EOF, "" },										// EOF
 
 	// Types
 	{ Token::TOK_VOID, "void$" },								// void
@@ -136,9 +148,11 @@ const std::vector<std::pair<Token, std::string>> TOKEN_REGEXES = {
 	{ Token::TOK_NUMBER, "number$" },							// number
 	{ Token::TOK_STRING, "string$" },							// string
 
-	{ Token::TOK_LINE_COMMENT, "\\/\\/"},						// //
-	{ Token::TOK_BLOCK_COMMENT_START, "\\/\\*"},				// /*
-	{ Token::TOK_BLOCK_COMMENT_END, "\\*\\/"},					// */
+	{ Token::TOK_NEW_LINE, "\n" },								// \n
+	{ Token::TOK_TAB, "\t" },									// \t
+	{ Token::TOK_SPACE, " " },									// ' '
+	{ Token::TOK_LINE_COMMENT, "//.*\n" },						// // .*
+	{ Token::TOK_BLOCK_COMMENT, "\\/\\*.*\\*\\/" },				// /* .* */
 
 	// Operators
 	{ Token::TOK_OPEN_PAREN, "\\($" },							// (
@@ -174,7 +188,7 @@ const std::vector<std::pair<Token, std::string>> TOKEN_REGEXES = {
 
 	{ Token::TOK_STRICT_EQUAL, "===$" },						// ===
 	{ Token::TOK_LOOSE_EQUAL, "==$" },							// ==
-	{ Token::TOK_ASSIGN, "=$" },								// =
+	{ Token::TOK_ASSIGN, "=" },								// =
 	{ Token::TOK_NOT_EQUAL, "!=$" },							// !=
 	{ Token::TOK_NOT, "!$" },									// !
 

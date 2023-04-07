@@ -9,13 +9,6 @@
 #include "Tokens.h"
 
 
-// FUNCTION PROTOTYPES
-std::vector<std::pair<Token, std::string>> Tokenize(std::string data);
-std::string GetMasterRegex();
-
-
-
-
 //int index = 0;
 //int length = data.length();
 //
