@@ -1,8 +1,9 @@
 #pragma once
 
+#include "Tokens.h"
+
 #include <string>
 #include <vector>
-#include "Tokens.h"
 
 class Lexer {
 	public:
@@ -23,7 +24,7 @@ class Lexer {
 		void SkipWhitespace();
 		void SkipLineComment();
 		void SkipBlockComment();
-		void SkipString();
+		void Skipstring();
 		void SkipNumber();
 		void SkipIdentifier();
 		void SkipOperator();

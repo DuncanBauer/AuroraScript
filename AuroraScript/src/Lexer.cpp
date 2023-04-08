@@ -59,12 +59,12 @@ std::vector<std::pair<Token, std::string>> Lexer::Tokenize(std::string _data)
 void Lexer::FindToken(auto match) {
 	for (const auto& tokenRegex : TOKEN_REGEXES) {
 		if (std::regex_match(match.str(), std::regex(tokenRegex.second))) {
-			if (tokenRegex.first == Token::TOK_NEW_LINE ||
-				tokenRegex.first == Token::TOK_TAB ||
-				tokenRegex.first == Token::TOK_SPACE
-				) {
-				break;
-			}
+			//if (tokenRegex.first == Token::TOK_NEW_LINE ||
+			//	tokenRegex.first == Token::TOK_TAB ||
+			//	tokenRegex.first == Token::TOK_SPACE
+			//	) {
+			//	break;
+			//}
 			tokens.push_back(std::make_pair(tokenRegex.first, match.str()));
 			break;
 		}

@@ -1,8 +1,18 @@
 #pragma once
 
+#include <string>
+#include <vector>
+
 enum class UnaryExpressionType {
 	PREFIX,
 	POSTFIX
+};
+
+enum class DataType {
+	VOID,
+	BOOL,
+	NUMBER,
+	STRING,
 };
 
 enum class Token {
@@ -114,6 +124,8 @@ enum class Token {
 
 	TOK_INCREMENT,		// ++
 	TOK_DECREMENT,		// --
+
+	TOK_
 };
 
 const std::vector<std::pair<Token, std::string>> TOKEN_REGEXES = {
@@ -155,7 +167,7 @@ const std::vector<std::pair<Token, std::string>> TOKEN_REGEXES = {
 	{ Token::TOK_BLOCK_COMMENT, "\\/\\*.*\\*\\/" },				// /* .* */
 
 	// Operators
-	{ Token::TOK_OPEN_PAREN, "\\($" },							// (
+	{ Token::TOK_OPEN_PAREN, "\\(" },							// (
 	{ Token::TOK_CLOSE_PAREN, "\\)$" },							// )
 	{ Token::TOK_OPEN_BRACE, "\\{$" },							// {
 	{ Token::TOK_CLOSE_BRACE, "\\}$" },							// }
@@ -227,3 +239,5 @@ const std::vector<std::pair<Token, std::string>> TOKEN_REGEXES = {
 	// User-made identifiers
 	{ Token::TOK_IDENTIFIER, "[a-zA-Z_][a-zA-Z0-9_]*" },		// [a-zA-Z_][a-zA-Z0-9_]*
 };
+
+std::string TokenToString(Token token);

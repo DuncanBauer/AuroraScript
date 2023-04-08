@@ -1,8 +1,7 @@
-#include "common.h"
-
 #include "Lexer.h"
 #include "Parser.h"
 
+#include <iostream>
 #include <fstream>
 #include <sstream>
 
@@ -20,6 +19,8 @@ int main(int argc, char** argv)
 		Lexer lexer;
 		std::vector<std::pair<Token, std::string>> tokens = lexer.Tokenize(data);
 
+
+		std::cout << "Token Count: " << tokens.size() << '\n';
 		for (auto t : tokens) {
 			//if (t.first == Token::TOK_NEW_LINE) continue;
 			std::cout << (int)t.first << ' ';
@@ -29,7 +30,12 @@ int main(int argc, char** argv)
 		std::cin.ignore(1000, '\n');
 
 		Parser parser(tokens);
-		auto ast = parser.Parse();
+		std::unique_ptr<ProgramNode> ast = parser.Parse();
+		std::cout << "AST Size: " << ast->statements.size() << std::endl;
+		
+		for (int i = 0; i < ast->statements.size(); i++) {
+			ast->statements[i]->Print();
+		}
 		
 		std::cin.ignore(1000, '\n');
 	}
@@ -37,5 +43,4 @@ int main(int argc, char** argv)
 	{
 		std::cout << e.what() << '\n';
 	}
-
 }

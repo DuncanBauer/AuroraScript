@@ -1,140 +1,328 @@
 #pragma once
 
-#include "common.h"
+#include "Tokens.h"
 
-#include <map>
+#include <iostream>
+#include <memory>
 #include <string>
 #include <vector>
 
+struct StatementNode;
+struct AssignmentStatementNode;
+struct VariableDeclarationStatementNode;
+struct ExpressionNode;
+struct AdditiveExpressionNode;
+struct MultiplicativeExpressionNode;
+struct UnaryExpressionNode;
+struct PostfixExpressionNode;
+struct PrimaryExpressionNode;
+struct IdentifierNode;
+struct NumberNode;
+struct StringNode;
+struct BoolNode;
+
+enum class NodeType {
+	PROGRAM,
+	STATEMENT,
+	ASSIGNMENT_STATEMENT,
+	VARIABLE_DECLARATION_STATEMENT,
+	EXPRESSION,
+	ADDITIVE_EXPRESSION,
+	MULTIPLICATIVE_EXPRESSION,
+	UNARY_EXPRESSION,
+	POSTFIX_EXPRESSION,
+	PRIMARY_EXPRESSION,
+	IDENTIFIER,
+	NUMBER,
+	STRING,
+	BOOL
+};
+
 struct ASTNode {
 	virtual ~ASTNode() = default;
+	virtual void Print() = 0;
+
+	NodeType type;
+};
+
+struct StatementNode : public ASTNode {
+	virtual void Print() {}
+
+	NodeType type = NodeType::STATEMENT;
+};
+
+struct ExpressionNode : public ASTNode {
+	virtual void Print() {}
+
+	NodeType type = NodeType::EXPRESSION;
+};
+
+struct BoolNode : public ASTNode {
+	BoolNode() {}
+	BoolNode(bool value) : value(value) {}
+
+	virtual void Print() {
+		std::cout << value;
+	}
+
+	NodeType type = NodeType::BOOL;
+	bool value;
+};
+
+struct IdentifierNode : public ASTNode {
+	IdentifierNode() {}
+	IdentifierNode(std::string value) : value(value) {}
+
+	virtual void Print() {
+		std::cout <<  value;
+	}
+	
+	NodeType type = NodeType::IDENTIFIER;
+	std::string value;
+};
+
+struct NumberNode : public ASTNode {
+	NumberNode() {}
+	NumberNode(double value) : value(value) {}
+
+	virtual void Print() {
+		std::cout << value;
+	}
+
+	NodeType type = NodeType::NUMBER;
+	double value;
+};
+
+struct StringNode : public ASTNode {
+	StringNode() {}
+	StringNode(std::string value) : value(value) {}
+
+	virtual void Print() {
+		std::cout << value;
+	}
+	
+	NodeType type = NodeType::STRING;
+	std::string value;
 };
 
 struct ProgramNode : public ASTNode {
+	virtual void Print() {
+		for (int i = 0; i < statements.size(); i++) {
+			statements[i]->Print();
+		}
+	}
+	
+	NodeType type = NodeType::PROGRAM;
 	std::vector<std::unique_ptr<ASTNode>> statements;
 };
 
-struct BlockNode : public ASTNode {
-	std::vector<std::unique_ptr<ASTNode>> statements;
+struct AssignmentStatementNode : public ASTNode {
+	AssignmentStatementNode() {}
+	
+	virtual void Print() {
+		if (left) {
+			left->Print();
+		}
+
+		std::cout << " = ";
+		
+		if (right) {
+			right->Print();
+		}
+		
+		std::cout << std::endl;
+	}
+
+	NodeType type = NodeType::ASSIGNMENT_STATEMENT;
+	std::unique_ptr<ASTNode> left = nullptr;
+	std::unique_ptr<ASTNode> right = nullptr;
 };
 
-struct StatementNode : public ASTNode {};
+struct VariableDeclarationStatementNode : public ASTNode {
+	VariableDeclarationStatementNode() {}
+	VariableDeclarationStatementNode(DataType dataType, std::unique_ptr<ASTNode> identifier, std::unique_ptr<ASTNode> value)
+		: dataType(dataType), identifier(std::move(identifier)), value(std::move(value)) {}
 
-struct IfStatementNode : public StatementNode {
-	IfStatementNode(std::unique_ptr<ASTNode> condition, std::unique_ptr<ASTNode> ifBlock, std::unique_ptr<ASTNode> elseBlock) :
-		condition(std::move(condition)), ifBlock(std::move(ifBlock)), elseBlock(std::move(elseBlock)) {}
-	std::unique_ptr<ASTNode> condition;
-	std::unique_ptr<ASTNode> ifBlock;
-	std::unique_ptr<ASTNode> elseBlock;
+	virtual void Print() {
+		std::cout << "Variable Declaration: ";
+		
+		switch (dataType) {
+			case DataType::BOOL:
+				std::cout << "bool ";
+				break;
+			case DataType::NUMBER:
+				std::cout << "number ";
+				break;
+			case DataType::STRING:
+				std::cout << "string ";
+				break;
+			case DataType::VOID:
+				std::cout << "void ";
+				break;
+			default:
+				break;
+		}
+
+		if (identifier) {
+			identifier->Print();
+		}
+		
+		if (value) {
+			std::cout << " = ";
+			value->Print();
+		}
+		
+		std::cout << std::endl;
+	}
+
+	NodeType type = NodeType::VARIABLE_DECLARATION_STATEMENT;
+	DataType dataType;
+	std::unique_ptr<ASTNode> identifier = nullptr;
+	std::unique_ptr<ASTNode> value = nullptr;
 };
 
-struct ReturnStatementNode : public StatementNode {
-	ReturnStatementNode() {}
-	ReturnStatementNode(std::unique_ptr<ASTNode> value) 
-		: value(std::move(value)) {}
-	std::unique_ptr<ASTNode> value;
+struct PrimaryExpressionNode : public ASTNode {
+	PrimaryExpressionNode() {}
+	PrimaryExpressionNode(std::unique_ptr<ASTNode> expr)
+		: expr(std::move(expr)) {}
+
+	virtual void Print() {
+		if (expr)
+			expr->Print();
+	}
+
+	NodeType type = NodeType::PRIMARY_EXPRESSION;
+	std::unique_ptr<ASTNode> expr = nullptr;
 };
 
-struct VarStatementNode : public StatementNode {
-	VarStatementNode(Token type, std::string name, std::unique_ptr<ASTNode> value) 
-		: type(type), name(name), value(std::move(value)) {}
-	Token type;
-	std::string name;
-	std::unique_ptr<ASTNode> value;
+struct PostfixExpressionNode : public ASTNode {
+	PostfixExpressionNode() {}
+	PostfixExpressionNode(std::unique_ptr<ASTNode> expr, Token op = Token::TOK_)
+		: expr(std::move(expr)), op(op) {}
+
+	virtual void Print() {
+		if (expr)
+			expr->Print();
+	}
+
+	NodeType type = NodeType::POSTFIX_EXPRESSION;
+	std::unique_ptr<ASTNode> expr = nullptr;
+	Token op = Token::TOK_;
 };
 
-//struct WhileStatementNode : public StatementNode {
-//	std::unique_ptr<ASTNode> condition;
-//	std::unique_ptr<ASTNode> block;
-//};
+struct UnaryExpressionNode : public ASTNode {
+	UnaryExpressionNode() {}
+	UnaryExpressionNode(std::unique_ptr<ASTNode> expr, Token op = Token::TOK_)
+		: expr(std::move(expr)), op(op) {}
 
-struct ExpressionNode : public ASTNode {
+	virtual void Print() {
+		if(expr)
+			expr->Print();
+	}
+
+	NodeType type = NodeType::UNARY_EXPRESSION;
+	std::unique_ptr<ASTNode> expr = nullptr;
+	Token op = Token::TOK_;
 };
 
-struct UnaryExpressionNode : public ExpressionNode {
-	UnaryExpressionNode(Token op, std::unique_ptr<ExpressionNode> operand, UnaryExpressionType type)
-		: operand(std::move(operand)), op(op), type(type) {}
-	Token op;
-	std::unique_ptr<ExpressionNode> operand;
-	UnaryExpressionType type;
-};
-
-struct BinaryExpressionNode : public ExpressionNode {
-	BinaryExpressionNode(std::unique_ptr<ExpressionNode> left, std::unique_ptr<ExpressionNode> right, Token op)
+struct MultiplicativeExpressionNode : public ASTNode {
+	MultiplicativeExpressionNode() {}
+	MultiplicativeExpressionNode(std::unique_ptr<ASTNode> left, std::unique_ptr<ASTNode> right, Token op = Token::TOK_)
 		: left(std::move(left)), right(std::move(right)), op(op) {}
-	std::unique_ptr<ExpressionNode> left;
-	std::unique_ptr<ExpressionNode> right;
-	Token op;
+
+	virtual void Print() {
+		if(left)
+			left->Print();
+
+		if(op != Token::TOK_) 
+			std::cout << " " << (int)op << " ";
+
+		if(right)
+			right->Print();
+	}
+
+	NodeType type = NodeType::MULTIPLICATIVE_EXPRESSION;
+	std::unique_ptr<ASTNode> left = nullptr;
+	std::unique_ptr<ASTNode> right = nullptr;
+	Token op = Token::TOK_;
 };
 
-struct LiteralExpressionNode : public ExpressionNode {
-	LiteralExpressionNode(std::string stringVal) 
-		: stringVal(stringVal), type(Token::TOK_STRING) {}
-	LiteralExpressionNode(double numberVal) 
-		: numberVal(numberVal), type(Token::TOK_NUMBER) {}
-	LiteralExpressionNode(bool boolVal) 
-		: boolVal(boolVal), type(Token::TOK_BOOL) {}
+struct AdditiveExpressionNode : public ASTNode {
+	AdditiveExpressionNode() {}
+	AdditiveExpressionNode(std::unique_ptr<ASTNode> left, std::unique_ptr<ASTNode> right, Token op = Token::TOK_)
+		: left(std::move(left)), right(std::move(right)), op(op) {}
 
-	Token type;
-	std::string stringVal = "";
-	double numberVal = 0;
-	bool boolVal = false;
-};
+	virtual void Print() {
+		if (left)
+			left->Print();
 
-struct IdentifierExpressionNode : public ExpressionNode {
-	IdentifierExpressionNode(std::string name) : name(name) {}
-	std::string name;
+		if(op != Token::TOK_)
+			std::cout << " " << (int)op << " ";
+
+		if (right)
+			right->Print();
+	}
+
+	NodeType type = NodeType::ADDITIVE_EXPRESSION;
+	std::unique_ptr<ASTNode> left = nullptr;
+	std::unique_ptr<ASTNode> right = nullptr;
+	Token op = Token::TOK_;
 };
 
 class Parser
 {
-public:
-	Parser(std::vector<std::pair<Token, std::string>> tokens) :m_tokens(tokens) {
-		m_currentToken = 0;
-		m_currentLine = 0;
-	}
-
-	std::unique_ptr<ASTNode> Parse();
-
-private:
-	std::unique_ptr<ProgramNode> ParseProgram();
-	std::unique_ptr<BlockNode> ParseBlock();
-	std::unique_ptr<StatementNode> ParseStatement();
-	std::unique_ptr<IfStatementNode> ParseIfStatement();
-	std::unique_ptr<ReturnStatementNode> ParseReturnStatement();
-	std::unique_ptr<VarStatementNode> ParseVarStatement();
-
-	std::unique_ptr<ExpressionNode> ParseExpression();
-	std::unique_ptr<ExpressionNode> ParsePrimaryExpression();
-	std::unique_ptr<UnaryExpressionNode> ParseUnaryExpression();
-	std::unique_ptr<BinaryExpressionNode> ParseBinaryExpression();
-	std::unique_ptr<LiteralExpressionNode> ParseLiteralExpression();
-	std::unique_ptr<IdentifierExpressionNode> ParseIdentifierExpression();
-	
-	void ConsumeToken() {
-		m_currentToken++;
-	}
-
-	std::pair<Token, std::string> PeekToken() {
-		if (m_tokens.size() < m_currentToken + 1) {
-			return m_tokens[m_currentToken + 1];
+	public:
+		Parser(std::vector<std::pair<Token, std::string>> tokens) :m_tokens(tokens) {
+			m_currentToken = 0;
+			m_currentLine = 0;
 		}
-		return std::make_pair(Token::TOK_EOF, "");
-	}
 
-	std::pair<Token, std::string> PeekToken(size_t offset) {
-		if (m_tokens.size() < m_currentToken + offset) {
-			return m_tokens[m_currentToken + offset];
+		std::unique_ptr<ASTNode> Parse();
+
+	private:
+		std::unique_ptr<ASTNode> ParseProgram();
+
+		std::unique_ptr<ASTNode> ParseStatement();
+		std::unique_ptr<ASTNode> ParseAssignmentStatement();
+		std::unique_ptr<ASTNode> ParseVariableDeclarationStatement();
+
+		std::unique_ptr<ASTNode> ParseExpression();
+		std::unique_ptr<ASTNode> ParseAdditiveExpression();
+		std::unique_ptr<ASTNode> ParseMultiplicativeExpression();
+		std::unique_ptr<ASTNode> ParseUnaryExpression();
+		std::unique_ptr<ASTNode> ParsePostfixExpression();
+		std::unique_ptr<ASTNode> ParsePrimaryExpression();
+
+		void ConsumeToken() {
+			m_currentToken++;
+
+			while (m_currentToken < m_tokens.size() &&
+				  (m_tokens[m_currentToken].first == Token::TOK_SPACE ||
+				   m_tokens[m_currentToken].first == Token::TOK_TAB)) {
+				m_currentToken++;
+			}
 		}
-		return std::make_pair(Token::TOK_EOF, "");
-	}
 
-	bool IsAtEnd() {
-		return m_currentToken >= m_tokens.size();
-	}
+		std::pair<Token, std::string> PeekToken() {
+			if (m_tokens.size() < m_currentToken + 1) {
+				return m_tokens[m_currentToken + 1];
+			}
+			return std::make_pair(Token::TOK_EOF, "");
+		}
 
-private:
-	std::vector<std::pair<Token, std::string>> m_tokens;
-	size_t m_currentToken;
-	size_t m_currentLine;
+		std::pair<Token, std::string> PeekToken(size_t offset) {
+			if (m_tokens.size() < m_currentToken + offset) {
+				return m_tokens[m_currentToken + offset];
+			}
+			return std::make_pair(Token::TOK_EOF, "");
+		}
+
+		bool IsAtEnd() {
+			return m_currentToken >= m_tokens.size();
+		}
+
+	private:
+		std::vector<std::pair<Token, std::string>> m_tokens;
+		size_t m_currentToken;
+		size_t m_currentLine;
 };
